@@ -1,0 +1,21 @@
+{
+    "HomePage_LT":{
+        "URL":"https://www.carwale.com/",
+        "newCars":"//div[normalize-space()='NEW CARS']",
+        "findNewCars":"text=Find New Cars"
+
+    },
+    "NewCarsPage_LT":{
+        "newCarsHeading":"//h1[normalize-space()='New Cars']",
+        "bmwCar":"//div[normalize-space()='BMW']",
+        "hondaCar":"//div[normalize-space()='Honda']",
+        "hyundaiCar":"//div[normalize-space()='Hyundai']",
+        "toyotaCar":"//div[normalize-space()='Toyota']"
+    },
+    "CarBase":{
+        "carTitle":"//header[1]/h1[not(contains(text(),'New'))]",
+        "carName":"//div/div/div[1]/div/a/h3", 
+        "carPride":"//div/div[3]/div/span/span[1]" 
+    }
+
+}
