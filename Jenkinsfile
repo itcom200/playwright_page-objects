@@ -1,7 +1,5 @@
 pipeline {
-    agent {
-        label 'Built-In Node||BVM1'
-    }
+    agent any
 
     options{
         // เก็บ 3 build และเก็บ artifact ไว้แค่ 2 build อีก 1 build ที่เหลือจะ ไม่มี artifact เก็บไว้
