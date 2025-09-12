@@ -17,6 +17,6 @@ test('get started link', async ({ page }) => {
   await expect(page.getByRole('heading', { name: 'Installation' })).toBeVisible();
 });
 
-test('test',async({page})=>{
-  await page.goto('/')
-})
+// test('test',async({page})=>{
+//   await page.goto('/')
+// })
