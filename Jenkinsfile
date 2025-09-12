@@ -41,7 +41,8 @@ pipeline {
                     keepAll: true, //เก็บ report ของ ทุก build ถ้า false จะเก็บแค่ report ของ build ล่าสุด
                     reportDir: 'playwright-report',
                     reportFiles: 'index.html',
-                    reportName: 'Playwright Test Report' //ชื่อ report ที่จะแสดงบน Jenkins UI
+                    reportName: 'Playwright Test Report', //ชื่อ report ที่จะแสดงบน Jenkins UI
+                    useWrapperFileDirectly: true //เปิด index.html โดยตรง แทนที่จะสร้าง wrapper
                 ])
 
             script {
