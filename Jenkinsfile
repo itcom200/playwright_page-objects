@@ -29,11 +29,12 @@ pipeline {
          stage('Run Tests') {
             steps {
                 bat 'npx playwright test --reporter=html'
-            }
+                bat 'npx playwright show-report --report=playwright-report --output=playwright-report-static'
+            }//แสดง report โดยใช้ จาก playwright-report มาที่ playwright-report-static แทนเป็นการสร้างใหม่เพื่อแสดง
         }
         stage('Publish Report') {
             steps {
-            archiveArtifacts artifacts: 'playwright-report/**', fingerprint: true
+            archiveArtifacts artifacts: 'playwright-report-static/**', fingerprint: true
             }
         }
     }
@@ -45,7 +46,7 @@ pipeline {
                     allowMissing: false, //ไม่เจอ report build จะ fail ทันที
                     alwaysLinkToLastBuild: true, //จะสร้าง link report ไปยัง build ล่าสุดเสมอ
                     keepAll: true, //เก็บ report ของ ทุก build ถ้า false จะเก็บแค่ report ของ build ล่าสุด
-                    reportDir: 'playwright-report',
+                    reportDir: 'playwright-report-static',
                     reportFiles: 'index.html',
                     reportName: 'Playwright Test Report' //ชื่อ report ที่จะแสดงบน Jenkins UI
                 ])
