@@ -27,6 +27,4 @@ export class CarBase extends BasePage {
         }
         return cars;
     }
-
-
 }
