@@ -1,5 +1,5 @@
 import { test, expect } from '../Utils/test-base';
-import { readCSVData } from '../Utils/read.CSV';
+import { readCSV } from '../Utils/read.CSV';
 
 test.describe('Find New Car', () => {
     test.beforeEach(async ({ pages }) => {
@@ -14,7 +14,7 @@ test.describe('Find New Car', () => {
         await expect(headerText).toContain('New Cars');
     });
 
-    const testData = readCSVData('data/testdata.csv')
+    const testData = readCSV('data/testdata.csv',true)
     test('Parameterized Find New Car', async ({ pages }) => {
         for (const data of testData) {
             await pages.homePage.findNewCar();
