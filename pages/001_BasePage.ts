@@ -2,7 +2,7 @@ import { Page } from "@playwright/test";
  
 export class BasePage{
     protected page:Page; 
-// protected(โพเทคติ) เหมือน private แต่คลาสลูกที่ extends ไปเอาไปใช้ได้
+// protected(โพเทคติ) เหมือน private แต่คลาสลูกที่ extends ไปเอาไปใช้ได้ 
     constructor(page:Page){
         this.page=page;
     }
