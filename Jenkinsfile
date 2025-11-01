@@ -20,15 +20,17 @@ pipeline {
             }
         }
         
+//npm install -> Dev ปกติ -> ยืดหยุ่น ติดตั้งตามไฟล์ package.json
+//npm ci -> CI/CD หรือ Jenkins -> ติดตั้งตามไฟล์ package-lock.json เป๊ะ + ลบ node_modules ก่อนเสมอ
         stage('Install Dependencies') {
             steps {
-                bat 'npm ci'
-                bat 'npx playwright install'
+                bat 'npm ci' //ติดตั้ง lib ต่าง ๆ (เช่น @playwright/test, csv-parse)
+                bat 'npx playwright install' //โหลด browser ที่ Playwright ใช้ (Chromium, Firefox, WebKit)
             }
         }
          stage('Run Tests') {
             steps {
-                bat 'npx playwright test --reporter=html'
+                bat 'npx playwright test --reporter=html --output=playwright-report'
             }
         }
         stage('Publish Report') {
