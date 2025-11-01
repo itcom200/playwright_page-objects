@@ -13,7 +13,7 @@ pipeline {
             steps {
                 // stage('Checkout'): ดึงโค้ดจาก repository ที่กำหนด
                 checkout([$class: 'GitSCM',
-                branches: [[name: '*/master']],
+                branches: [[name: '*/dev']],
                 userRemoteConfigs: [[url: 'https://github.com/itcom200/playwright_page-objects.git']],
                 extensions: [[$class: 'CleanBeforeCheckout']]
                 ])
