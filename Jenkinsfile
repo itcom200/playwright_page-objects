@@ -1,62 +1,81 @@
 pipeline {
     agent any
 
-    options{
-        // เก็บ 3 build และเก็บ artifact ไว้แค่ 2 build อีก 1 build ที่เหลือจะ ไม่มี artifact เก็บไว้
+    options {
         buildDiscarder(logRotator(numToKeepStr: '3', artifactNumToKeepStr: '2'))
-        disableConcurrentBuilds()     
-        skipDefaultCheckout() //สั่งให้ Jenkins ไม่ต้อง checkout อัตโนมัติ ทำ checkout เองใน stage
+        disableConcurrentBuilds()
+        skipDefaultCheckout()
     }
 
     stages {
         stage('Checkout') {
             steps {
-                // stage('Checkout'): ดึงโค้ดจาก repository ที่กำหนด
                 checkout([$class: 'GitSCM',
-                branches: [[name: '*/dev']],
-                userRemoteConfigs: [[url: 'https://github.com/itcom200/playwright_page-objects.git']],
-                extensions: [[$class: 'CleanBeforeCheckout']]
+                    branches: [[name: '*/dev']],
+                    userRemoteConfigs: [[
+                        url: 'https://github.com/itcom200/playwright_page-objects.git',
+                        credentialsId: 'github-playwright-pat'  // ✅ ถ้ามี PAT credential
+                    ]],
+                    extensions: [[$class: 'CleanBeforeCheckout']]
                 ])
             }
         }
-        
-//npm install -> Dev ปกติ -> ยืดหยุ่น ติดตั้งตามไฟล์ package.json
-//npm ci -> CI/CD หรือ Jenkins -> ติดตั้งตามไฟล์ package-lock.json เป๊ะ + ลบ node_modules ก่อนเสมอ
+
         stage('Install Dependencies') {
             steps {
-                bat 'npm ci' //ติดตั้ง lib ต่าง ๆ (เช่น @playwright/test, csv-parse)
-                bat 'npx playwright install' //โหลด browser ที่ Playwright ใช้ (Chromium, Firefox, WebKit)
+                bat 'npm ci'
+                bat 'npx playwright install'
             }
         }
-         stage('Run Tests') {
+
+        stage('Run Tests') {
             steps {
-                bat 'npx playwright test --reporter=html --output=playwright-report'
+                bat 'npx playwright test'
+            }
+            post {
+                always {
+                    archiveArtifacts artifacts: 'playwright-report/**', fingerprint: true
+                    archiveArtifacts artifacts: 'allure-results/**', allowEmptyArchive: true
+                }
             }
         }
-        stage('Publish Report') {
+
+        stage('Generate Allure Report') {
             steps {
-            archiveArtifacts artifacts: 'playwright-report/**', fingerprint: true
+                // generate allure-report from allure-results
+                bat 'npx allure generate allure-results --clean -o allure-report'
+            }
+        }
+
+        stage('Publish Reports') {
+            steps {
+                // ✅ Keep Playwright HTML report
+                publishHTML(target: [
+                    allowMissing: false,
+                    alwaysLinkToLastBuild: true,
+                    keepAll: true,
+                    reportDir: 'playwright-report',
+                    reportFiles: 'index.html',
+                    reportName: 'Playwright Test Report'
+                ])
+
+                // ✅ Add Allure report to Jenkins tab
+                allure([
+                    includeProperties: false,
+                    jdk: '',
+                    results: [[path: 'allure-results']]
+                ])
             }
         }
     }
 
-    
     post {
         always {
-            publishHTML(target: [
-                    allowMissing: false, //ไม่เจอ report build จะ fail ทันที
-                    alwaysLinkToLastBuild: true, //จะสร้าง link report ไปยัง build ล่าสุดเสมอ
-                    keepAll: true, //เก็บ report ของ ทุก build ถ้า false จะเก็บแค่ report ของ build ล่าสุด
-                    reportDir: 'playwright-report',
-                    reportFiles: 'index.html',
-                    reportName: 'Playwright Test Report' //ชื่อ report ที่จะแสดงบน Jenkins UI
-                ])
-
             script {
                 emailext(
                     subject: "Jenkins Job - Build ${currentBuild.fullDisplayName}",
                     body: """<p>Build ${currentBuild.fullDisplayName} is completed.</p>
-                             <p>Please check the attached test results.</p>""",
+                             <p>Please check the attached test results or open the Allure/HTML reports on Jenkins.</p>""",
                     to: 'love_bas_bas@hotmail.com',
                     attachmentsPattern: 'playwright-report/**/*.html,playwright-report/**/*.png',
                     mimeType: 'text/html'
