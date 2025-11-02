@@ -1,21 +1,22 @@
 {
   "name": "02_playwright",
-  "description": "", 
+  "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "npx playwright test", 
-    "test:headed": "npx playwright test --headed", 
-    "test:report": "npx playwright show-report", 
-    "test:debug": "npx playwright test --debug" 
+    "test": "npx playwright test",
+    "test:headed": "npx playwright test --headed",
+    "test:report": "npx playwright show-report",
+    "test:debug": "npx playwright test --debug"
   },
   "keywords": [],
-  "author": "", 
-  "license": "ISC", 
-  "devDependencies": { 
-    "@playwright/test": "^1.55.0", 
-    "@types/node": "^24.3.0" 
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@playwright/test": "^1.55.0",
+    "@types/node": "^24.3.0",
+    "allure-playwright": "^3.4.2"
   },
-  "dependencies": { 
-    "csv-parse": "^6.1.0" 
+  "dependencies": {
+    "csv-parse": "^6.1.0"
   }
 }
