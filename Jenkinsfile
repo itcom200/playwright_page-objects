@@ -21,29 +21,32 @@ pipeline {
             }
         }
 
+
         stage('Install Dependencies') {
             steps {
-                bat 'npm ci'
-                bat 'npx playwright install'
+                bat 'npm ci' //ติดตั้ง lib ต่าง ๆ (เช่น @playwright/test, csv-parse)
+                bat 'npx playwright install' //โหลด browser ที่ Playwright ใช้ (Chromium, Firefox, WebKit)
             }
         }
-
-        stage('Run Tests') {
+         stage('Run Tests') {
             steps {
-                bat 'npx playwright test'
-            }
-            post {
-                always {
-                    archiveArtifacts artifacts: 'playwright-report/**', fingerprint: true
-                    archiveArtifacts artifacts: 'allure-results/**', allowEmptyArchive: true
-                }
+                bat 'npx playwright test --reporter=html --output=playwright-report'
             }
         }
+        stage('Publish Report') {
+            steps {
+            archiveArtifacts artifacts: 'playwright-report/**', fingerprint: true
+            archiveArtifacts artifacts: 'allure-results/**', allowEmptyArchive: true
+            }
+        }
+    }
+
+
 
         stage('Generate Allure Report') {
             steps {
                 // generate allure-report from allure-results
-                bat 'npx allure generate allure-results --clean -o allure-report'
+                bat 'allure generate allure-results --clean -o allure-report'
             }
         }
 
