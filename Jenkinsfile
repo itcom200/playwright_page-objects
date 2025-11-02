@@ -21,7 +21,6 @@ pipeline {
             }
         }
 
-
         stage('Install Dependencies') {
             steps {
                 bat 'npm ci' //ติดตั้ง lib ต่าง ๆ (เช่น @playwright/test, csv-parse)
@@ -40,8 +39,6 @@ pipeline {
             }
         }
     }
-
-
 
         stage('Generate Allure Report') {
             steps {
@@ -85,5 +82,5 @@ pipeline {
                 )
             }
         }
-    }
 }
+
