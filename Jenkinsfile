@@ -21,7 +21,9 @@ pipeline {
                 ])
             }
         }
-
+        
+//npm install -> Dev ปกติ -> ยืดหยุ่น ติดตั้งตามไฟล์ package.json
+//npm ci -> CI/CD หรือ Jenkins -> ติดตั้งตามไฟล์ package-lock.json เป๊ะ + ลบ node_modules ก่อนเสมอ
         stage('Install Dependencies') {
             steps {
                 bat 'npm ci' //ติดตั้ง lib ต่าง ๆ (เช่น @playwright/test, csv-parse)
@@ -36,18 +38,11 @@ pipeline {
         stage('Publish Report') {
             steps {
             archiveArtifacts artifacts: 'playwright-report/**', fingerprint: true
-            archiveArtifacts artifacts: 'allure-results/**', allowEmptyArchive: true
-            }
-        }
-
-        stage('Generate Allure Report') {
-            steps {
-                // generate allure-report from allure-results
-                bat 'allure generate allure-results --clean -o allure-report'
             }
         }
     }
 
+    
     post {
         always {
             publishHTML(target: [
@@ -56,10 +51,7 @@ pipeline {
                     keepAll: true, //เก็บ report ของ ทุก build ถ้า false จะเก็บแค่ report ของ build ล่าสุด
                     reportDir: 'playwright-report',
                     reportFiles: 'index.html',
-                    reportName: 'Playwright Test Report', //ชื่อ report ที่จะแสดงบน Jenkins UI
-                    includeProperties: false,
-                    jdk: '',
-                    results: [[path: 'allure-results']]
+                    reportName: 'Playwright Test Report' //ชื่อ report ที่จะแสดงบน Jenkins UI
                 ])
 
             script {
@@ -75,5 +67,3 @@ pipeline {
         }
     }
 }
-
-
