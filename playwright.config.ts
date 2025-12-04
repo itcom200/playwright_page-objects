@@ -20,7 +20,7 @@ export default defineConfig({
   /* ถ้ารันบน CI ให้ retry test ที่ fail ได้สูงสุด 2 รอบ */
   workers: process.env.CI ? 1 : undefined,
   /* บน CI ให้รันทีละ 1 worker (กัน resource ล้นเครื่อง) */
-  reporter: [['html'], ['allure-playwright']],
+  reporter: [['list'],['html', { outputFolder: 'playwright-report', open: 'never' }], ['allure-playwright']],
   /* ใช้ HTML report เพื่อดูผลการทดสอบผ่าน browser (npx playwright show-report) */
   timeout: 25000,
   /*Run เกิน 15s ถ้ายังไม่จบ test จะ (failed) และหยุดทำงานทันที*/
