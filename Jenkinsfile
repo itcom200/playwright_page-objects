@@ -1,11 +1,10 @@
 pipeline {
     agent any
 
-    options{
-        // เก็บ 3 build และเก็บ artifact ไว้แค่ 2 build อีก 1 build ที่เหลือจะ ไม่มี artifact เก็บไว้
+    options {
         buildDiscarder(logRotator(numToKeepStr: '3', artifactNumToKeepStr: '2'))
-        disableConcurrentBuilds()     
-        skipDefaultCheckout() //สั่งให้ Jenkins ไม่ต้อง checkout อัตโนมัติ ทำ checkout เองใน stage
+        disableConcurrentBuilds()
+        skipDefaultCheckout()
     }
 
     stages {
@@ -15,44 +14,54 @@ pipeline {
                     branches: [[name: '*/dev']],
                     userRemoteConfigs: [[
                         url: 'https://github.com/itcom200/playwright_page-objects.git',
-                        credentialsId: 'github-playwright-pat'  // ✅ ถ้ามี PAT credential
+                        credentialsId: 'github-playwright-pat'
                     ]],
                     extensions: [[$class: 'CleanBeforeCheckout']]
                 ])
             }
         }
-        
-//npm install -> Dev ปกติ -> ยืดหยุ่น ติดตั้งตามไฟล์ package.json
-//npm ci -> CI/CD หรือ Jenkins -> ติดตั้งตามไฟล์ package-lock.json เป๊ะ + ลบ node_modules ก่อนเสมอ
-        stage('Install Dependencies') {
+
+        stage('Build Docker Image') {
             steps {
-                bat 'npm ci' //ติดตั้ง lib ต่าง ๆ (เช่น @playwright/test, csv-parse)
-                bat 'npx playwright install' //โหลด browser ที่ Playwright ใช้ (Chromium, Firefox, WebKit)
+                sh '''
+                  echo "Building Playwright Docker image..."
+                  docker build -t my-playwright-image .
+                '''
             }
         }
-         stage('Run Tests') {
+
+        stage('Run Tests in Docker') {
             steps {
-                bat 'npx playwright test --reporter=html --output=playwright-report'
+                sh '''
+                  # ลบ report เก่าทิ้งก่อน
+                  rm -rf playwright-report
+                  mkdir -p playwright-report
+
+                  # รัน container แล้ว mount โฟลเดอร์ report ออกมาไว้ที่ workspace
+                  docker run --rm \
+                    -v "$PWD/playwright-report:/app/playwright-report" \
+                    my-playwright-image
+                '''
             }
         }
-        stage('Publish Report') {
+
+        stage('Archive Report') {
             steps {
-            archiveArtifacts artifacts: 'playwright-report/**', fingerprint: true
+                archiveArtifacts artifacts: 'playwright-report/**', fingerprint: true
             }
         }
     }
 
-    
     post {
         always {
             publishHTML(target: [
-                    allowMissing: false, //ไม่เจอ report build จะ fail ทันที
-                    alwaysLinkToLastBuild: true, //จะสร้าง link report ไปยัง build ล่าสุดเสมอ
-                    keepAll: true, //เก็บ report ของ ทุก build ถ้า false จะเก็บแค่ report ของ build ล่าสุด
-                    reportDir: 'playwright-report',
-                    reportFiles: 'index.html',
-                    reportName: 'Playwright Test Report' //ชื่อ report ที่จะแสดงบน Jenkins UI
-                ])
+                allowMissing: false,
+                alwaysLinkToLastBuild: true,
+                keepAll: true,
+                reportDir: 'playwright-report',
+                reportFiles: 'index.html',
+                reportName: 'Playwright Test Report'
+            ])
 
             script {
                 emailext(

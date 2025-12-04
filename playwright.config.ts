@@ -36,7 +36,7 @@ export default defineConfig({
     // video: 'retain-on-failure',//-->off=ไม่อัด , on=อัดทุกTest , retain-on-failure=อันตอนFail , on-first-retry=อัดครั้งแรก
     video: 'off',
 
-    headless: false, //สั่งให้เปิด browser แบบ แสดงผล (มี UI) ขณะทดสอบ
+    headless: true, //สั่งให้เปิด browser แบบ แสดงผล (มี UI) ขณะทดสอบ
 
     // viewport: { width: 1280, height: 720 },//--> กำหนดขนาด browser ใช้ได้กับทุกอันที่ Playwright รองรับ
     // screenshot: 'only-on-failure',//-->off=ไม่ถ่าย , on=ถ่ายทุกครั้ง , only-on-failure=ถ่ายตอนFail-->เก็บไฟล์ test-results/
@@ -47,17 +47,22 @@ export default defineConfig({
   // Run test 2 รอบ รอบละ browser คือ Chrome (ผ่าน Chromium) และ Firefox
   // แต่ละรอบจะใช้ preset device ที่ Playwright เตรียมไว้ เช่น desktop viewport, user-agent เป็นต้น
   projects: [
+    
     {
-      name: 'chromium',
-      // testMatch:/.*chrome\.spec\.ts/, 
-      use: {
-        ...devices['Desktop Chrome']
-        //channel คือตัวเลือกเสริม ต้องใส่คู่กับ browserName ถ้าไม่กำหนดตัวเสริมมันจะอ่านแค่ browserName
-        , browserName: 'chromium',//ใช้ Chromium ที่ Playwright โหลดมาเอง ต้องใช้คู่กับ channel
-        channel: 'chrome',//ใช้ Chrome ตัวเต็มจากเครื่อง ถ้าไม่ใส่ channel จะใช้ Chromium ที่ Playwright โหลดมา
-        // browserName:'firefox',
-      },
+    name: 'chromium',
+    use: { browserName: 'chromium' }, // ✅ ลบ channel: 'chrome' ออก
     },
+    // {
+    //   name: 'chromium',
+    //   // testMatch:/.*chrome\.spec\.ts/, 
+    //   use: {
+    //     ...devices['Desktop Chrome']
+    //     //channel คือตัวเลือกเสริม ต้องใส่คู่กับ browserName ถ้าไม่กำหนดตัวเสริมมันจะอ่านแค่ browserName
+    //     , browserName: 'chromium',//ใช้ Chromium ที่ Playwright โหลดมาเอง ต้องใช้คู่กับ channel
+    //     channel: 'chrome',//ใช้ Chrome ตัวเต็มจากเครื่อง ถ้าไม่ใส่ channel จะใช้ Chromium ที่ Playwright โหลดมา
+    //     // browserName:'firefox',
+    //   },
+    // },
 
     {
       name: 'firefox',

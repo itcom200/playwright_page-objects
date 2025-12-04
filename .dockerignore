@@ -1,0 +1,24 @@
+# ไม่ต้องเอา dependency จากเครื่อง host ติดไปใน image
+node_modules/
+
+# output / report ต่าง ๆ ไม่ต้องอยู่ใน image
+test-results/
+playwright-report/
+allure-report/
+allure-results/
+blob-report/
+playwright/.cache/
+
+# ไฟล์/โฟลเดอร์ที่ใช้เฉพาะตอน dev
+.vscode/
+.idea/
+*.log
+*.tmp
+
+# ระบบ git ไม่จำเป็นใน container
+.git/
+.gitignore
+
+# Docker file เองไม่จำเป็นต้องถูก COPY เข้า image (เลือกใส่หรือลบออกก็ได้)
+Dockerfile
+docker-compose.yml
