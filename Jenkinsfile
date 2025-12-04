@@ -23,25 +23,37 @@ pipeline {
 
         stage('Build Docker Image') {
             steps {
-                sh '''
-                  echo "Building Playwright Docker image..."
-                  docker build -t my-playwright-image .
-                '''
+                script {
+                    if (isUnix()) {
+                        sh 'docker build -t my-playwright-image .'
+                    } else {
+                        bat 'docker build -t my-playwright-image .'
+                    }
+                }
             }
         }
 
         stage('Run Tests in Docker') {
             steps {
-                sh '''
-                  # ลบ report เก่าทิ้งก่อน
-                  rm -rf playwright-report
-                  mkdir -p playwright-report
-
-                  # รัน container แล้ว mount โฟลเดอร์ report ออกมาไว้ที่ workspace
-                  docker run --rm \
-                    -v "$PWD/playwright-report:/app/playwright-report" \
-                    my-playwright-image
-                '''
+                script {
+                    if (isUnix()) {
+                        sh '''
+                          rm -rf playwright-report
+                          mkdir -p playwright-report
+                          docker run --rm \
+                            -v "$PWD/playwright-report:/app/playwright-report" \
+                            my-playwright-image
+                        '''
+                    } else {
+                        bat '''
+                          if exist playwright-report rmdir /s /q playwright-report
+                          mkdir playwright-report
+                          docker run --rm ^
+                            -v "%cd%\\playwright-report:/app/playwright-report" ^
+                            my-playwright-image
+                        '''
+                    }
+                }
             }
         }
 
